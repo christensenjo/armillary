@@ -1,8 +1,22 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" @class(['dark' => ($appearance ?? 'system') == 'dark'])>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        <script>
+            (function () {
+                try {
+                    var k = 'armillary-theme';
+                    var s = localStorage.getItem(k);
+                    var dark =
+                        s === 'dark' ||
+                        (s !== 'light' &&
+                            window.matchMedia('(prefers-color-scheme: dark)')
+                                .matches);
+                    document.documentElement.classList.toggle('dark', dark);
+                } catch (e) {}
+            })();
+        </script>
 
         <link rel="icon" type="image/png" href="/brand/favicon-96x96.png" sizes="96x96" />
         <link rel="icon" type="image/svg+xml" href="/brand/favicon.svg" />

@@ -3,8 +3,8 @@ import { useState } from 'react';
 
 import { ArmillaryHeerichDevDashboard } from '@/components/ArmillaryHeerichDevDashboard';
 import { ArmillarySphere } from '@/components/ArmillarySphere';
-import { BrandAssetsMenu } from '@/components/BrandAssetsMenu';
 import { ClientOnly } from '@/components/ClientOnly';
+import { LogoMenu } from '@/components/LogoMenu';
 import { DEFAULT_ARMILLARY_HEERICH_CONFIG } from '@/lib/armillaryHeerichScene';
 import type { ArmillaryHeerichConfig } from '@/lib/armillaryHeerichScene';
 
@@ -27,7 +27,7 @@ export default function Welcome() {
                 <header className="pointer-events-none fixed inset-x-0 top-0 z-10 mr-12 flex justify-between p-4 sm:p-6">
                     <div className="pointer-events-auto mb-0">
                         <ClientOnly>
-                            <BrandAssetsMenu />
+                            <LogoMenu />
                         </ClientOnly>
                     </div>
                     <div className="flex shrink-0 justify-start">

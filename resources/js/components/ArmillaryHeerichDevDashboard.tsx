@@ -1,6 +1,7 @@
 import { useCallback, useId, useState } from 'react';
 
 import {
+    ARMILLARY_BRAND_COLOR_SWATCHES,
     DEFAULT_ARMILLARY_HEERICH_CONFIG,
     formatArmillaryConfigForPaste,
 } from '@/lib/armillaryHeerichScene';
@@ -282,33 +283,58 @@ export function ArmillaryHeerichDevDashboard({
                         const v = value[key];
 
                         return (
-                            <div key={key} className="flex items-center gap-2">
-                                <label
-                                    htmlFor={`${id}-text`}
-                                    className="w-24 shrink-0 font-ui text-[0.7rem] text-foreground"
+                            <div key={key} className="space-y-1">
+                                <div className="flex items-center gap-2">
+                                    <label
+                                        htmlFor={`${id}-text`}
+                                        className="w-24 shrink-0 font-ui text-[0.7rem] text-foreground"
+                                    >
+                                        {label}
+                                    </label>
+                                    <input
+                                        id={`${id}-text`}
+                                        type="text"
+                                        value={v}
+                                        onChange={(e) =>
+                                            setStringField(key, e.target.value)
+                                        }
+                                        spellCheck={false}
+                                        className="min-w-0 flex-1 rounded border border-border bg-background px-1.5 py-1 font-mono text-[0.65rem] text-foreground"
+                                    />
+                                    <input
+                                        id={`${id}-picker`}
+                                        type="color"
+                                        value={colorInputFallback(v)}
+                                        onChange={(e) =>
+                                            setStringField(key, e.target.value)
+                                        }
+                                        className="h-8 w-9 shrink-0 cursor-pointer rounded border border-border bg-background p-0"
+                                        aria-label={`${label} — hex picker`}
+                                    />
+                                </div>
+                                <div
+                                    className="ml-[6.5rem] flex flex-wrap gap-1"
+                                    role="group"
+                                    aria-label={`${label} — brand colors`}
                                 >
-                                    {label}
-                                </label>
-                                <input
-                                    id={`${id}-text`}
-                                    type="text"
-                                    value={v}
-                                    onChange={(e) =>
-                                        setStringField(key, e.target.value)
-                                    }
-                                    spellCheck={false}
-                                    className="min-w-0 flex-1 rounded border border-border bg-background px-1.5 py-1 font-mono text-[0.65rem] text-foreground"
-                                />
-                                <input
-                                    id={`${id}-picker`}
-                                    type="color"
-                                    value={colorInputFallback(v)}
-                                    onChange={(e) =>
-                                        setStringField(key, e.target.value)
-                                    }
-                                    className="h-8 w-9 shrink-0 cursor-pointer rounded border border-border bg-background p-0"
-                                    aria-label={`${label} — hex picker`}
-                                />
+                                    {ARMILLARY_BRAND_COLOR_SWATCHES.map(
+                                        ({ label: brandLabel, value }) => (
+                                            <button
+                                                key={brandLabel}
+                                                type="button"
+                                                title={brandLabel}
+                                                aria-label={`Set ${label} to ${brandLabel}`}
+                                                onClick={() =>
+                                                    setStringField(key, value)
+                                                }
+                                                className="size-5 shrink-0 rounded-full border border-border shadow-sm ring-offset-2 transition-transform hover:scale-110 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+                                                style={{
+                                                    backgroundColor: value,
+                                                }}
+                                            />
+                                        ),
+                                    )}
+                                </div>
                             </div>
                         );
                     })}

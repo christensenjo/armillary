@@ -1,10 +1,24 @@
-import { useMemo } from 'react';
+import { useMemo, useSyncExternalStore } from 'react';
 
 import {
     buildArmillarySvgString,
     mergeArmillaryConfig,
+    mergeArmillaryThemeAppearance,
 } from '@/lib/armillaryHeerichScene';
 import type { ArmillaryHeerichConfig } from '@/lib/armillaryHeerichScene';
+
+function subscribeDocumentDarkClass(cb: () => void): () => void {
+    const el = document.documentElement;
+    const mo = new MutationObserver(cb);
+
+    mo.observe(el, { attributes: true, attributeFilter: ['class'] });
+
+    return () => mo.disconnect();
+}
+
+function snapshotDocumentDark(): boolean {
+    return document.documentElement.classList.contains('dark');
+}
 
 function injectSvgPresentationClass(svg: string, className: string): string {
     return svg.replace('<svg ', `<svg class="${className}" fill="none" `);
@@ -15,8 +29,18 @@ type ArmillarySphereProps = {
 };
 
 export function ArmillarySphere({ config }: ArmillarySphereProps) {
+    const isDark = useSyncExternalStore(
+        subscribeDocumentDarkClass,
+        snapshotDocumentDark,
+        () => false,
+    );
+
     const merged = useMemo(() => mergeArmillaryConfig(config), [config]);
-    const svgHtml = useMemo(() => buildArmillarySvgString(merged), [merged]);
+    const themed = useMemo(
+        () => mergeArmillaryThemeAppearance(merged, isDark),
+        [merged, isDark],
+    );
+    const svgHtml = useMemo(() => buildArmillarySvgString(themed), [themed]);
 
     const html = useMemo(
         () =>

@@ -113,17 +113,21 @@ export type ArmillaryHeerichConfig = {
     axisStroke: string;
 };
 
+/** Light-mode fills aligned with brand abyss / nordic for theme switching. */
+export const ARMILLARY_LIGHT_ECLIPTIC_FILL = '#0C1B15';
+export const ARMILLARY_LIGHT_AXIS_FILL = '#1D393C';
+
 export const DEFAULT_ARMILLARY_HEERICH_CONFIG: ArmillaryHeerichConfig = {
-    polarAxisTiltDeg: -31.5,
-    obliquityDeg: 45,
-    instrumentYawDeg: 24,
-    eclipticPhaseDeg: 80,
-    cameraAngle: 186,
+    polarAxisTiltDeg: -45,
+    obliquityDeg: 35.25,
+    instrumentYawDeg: 2,
+    eclipticPhaseDeg: 24,
+    cameraAngle: 214,
     cameraDistance: 6,
-    tile: 34,
+    tile: 33,
     rGlobe: 6.35,
-    rEq: 8.95,
-    rEcl: 9.85,
+    rEq: 8.1,
+    rEcl: 10.4,
     rMer: 13.9,
     tubeEq: 0.68,
     tubeEcl: 0.66,
@@ -131,20 +135,48 @@ export const DEFAULT_ARMILLARY_HEERICH_CONFIG: ArmillaryHeerichConfig = {
     axisExtentBeyondGlobe: 11.4,
     polarAxisRadius: 0.6,
     toSvgPadding: 14,
-    ringStrokeWidth: 0.1,
-    globeStrokeWidth: 0.1,
-    globeFill: "#C5D9E3",
-    globeStroke: "#ffffff",
-    equatorRingFill: "#A19ABD",
-    equatorRingStroke: "#ffffff",
-    eclipticRingFill: "#0C1B15",
-    eclipticRingStroke: "#ffffff",
-    meridianRingFill: "#B4C4C3",
-    meridianRingStroke: "#ffffff",
-    axisFill: "#1D393C",
-    axisStroke: "#ffffff",
+    ringStrokeWidth: 0.85,
+    globeStrokeWidth: 0.85,
+    globeFill: '#C5D9E3',
+    globeStroke: '#ffffff',
+    equatorRingFill: '#A19ABD',
+    equatorRingStroke: '#ffffff',
+    eclipticRingFill: ARMILLARY_LIGHT_ECLIPTIC_FILL,
+    eclipticRingStroke: '#ffffff',
+    meridianRingFill: '#B4C4C3',
+    meridianRingStroke: '#ffffff',
+    axisFill: ARMILLARY_LIGHT_AXIS_FILL,
+    axisStroke: '#ffffff',
 };
 
+/** CSS `var(--token)` values wired in `app.css`; safe for inline SVG fills. */
+export const ARMILLARY_BRAND_COLOR_SWATCHES = [
+    { label: 'Pearl', value: 'var(--pearl)' },
+    { label: 'Nordic', value: 'var(--nordic)' },
+    { label: 'Grape', value: 'var(--grape)' },
+    { label: 'Abyss', value: 'var(--abyss)' },
+    { label: 'Lightspeed', value: 'var(--lightspeed)' },
+    { label: 'Mist', value: 'var(--mist)' },
+] as const;
+
+/**
+ * Dark mode: ecliptic (abyss) → lightspeed, polar axis (nordic) → white.
+ * Other colors stay as configured for light.
+ */
+export function mergeArmillaryThemeAppearance(
+    config: ArmillaryHeerichConfig,
+    isDark: boolean,
+): ArmillaryHeerichConfig {
+    if (!isDark) {
+        return config;
+    }
+
+    return {
+        ...config,
+        eclipticRingFill: 'var(--lightspeed)',
+        axisFill: '#ffffff',
+    };
+}
 
 export function mergeArmillaryConfig(
     partial?: Partial<ArmillaryHeerichConfig>,
