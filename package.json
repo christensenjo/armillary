@@ -27,6 +27,7 @@
         "clsx": "^2.1.1",
         "concurrently": "^9.0.1",
         "geist": "^1.7.0",
+        "heerich": "^0.1.0",
         "laravel-vite-plugin": "^3.0.0",
         "lucide-react": "^1.7.0",
         "react": "^19.2.0",

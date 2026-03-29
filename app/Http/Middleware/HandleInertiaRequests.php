@@ -38,6 +38,11 @@ class HandleInertiaRequests extends Middleware
         return [
             ...parent::share($request),
             'name' => config('app.name'),
+            /**
+             * Local-only UI (e.g. armillary dev tools). Consumed via Inertia `usePage().props`
+             * alongside Wayfinder-generated route helpers in `resources/js/`.
+             */
+            'appLocal' => app()->environment('local'),
             'auth' => [
                 'user' => $request->user(),
             ],

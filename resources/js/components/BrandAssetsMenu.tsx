@@ -28,9 +28,9 @@ export function BrandAssetsMenu() {
                 <img
                     src="/brand/armillary_logo.svg"
                     alt=""
-                    width={28}
-                    height={28}
-                    className="pointer-events-none size-7 object-contain"
+                    width={60}
+                    height={60}
+                    className="pointer-events-none size-15 object-contain"
                     draggable={false}
                 />
             </Menu.Trigger>

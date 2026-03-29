@@ -1,10 +1,20 @@
-import { Head } from '@inertiajs/react';
+import { Head, usePage } from '@inertiajs/react';
+import { useState } from 'react';
 
+import { ArmillaryHeerichDevDashboard } from '@/components/ArmillaryHeerichDevDashboard';
 import { ArmillarySphere } from '@/components/ArmillarySphere';
 import { BrandAssetsMenu } from '@/components/BrandAssetsMenu';
 import { ClientOnly } from '@/components/ClientOnly';
+import { DEFAULT_ARMILLARY_HEERICH_CONFIG } from '@/lib/armillaryHeerichScene';
+import type { ArmillaryHeerichConfig } from '@/lib/armillaryHeerichScene';
 
 export default function Welcome() {
+    const { appLocal } = usePage().props;
+    const [armillaryDevConfig, setArmillaryDevConfig] =
+        useState<ArmillaryHeerichConfig>(() => ({
+            ...DEFAULT_ARMILLARY_HEERICH_CONFIG,
+        }));
+
     return (
         <>
             <Head title="Armillary Software">
@@ -14,24 +24,40 @@ export default function Welcome() {
                 />
             </Head>
             <div className="flex min-h-dvh flex-col bg-landing font-ui text-landing-foreground">
-                <header className="pointer-events-none fixed inset-x-0 top-0 z-10 flex justify-end p-4 sm:p-6">
-                    <div className="pointer-events-auto">
+                <header className="pointer-events-none fixed inset-x-0 top-0 z-10 mr-12 flex justify-between p-4 sm:p-6">
+                    <div className="pointer-events-auto mb-0">
                         <ClientOnly>
                             <BrandAssetsMenu />
                         </ClientOnly>
                     </div>
+                    <div className="flex shrink-0 justify-start">
+                        <h1 className="text-center font-wordmark text-[clamp(1.75rem,6vw,3.75rem)] leading-none tracking-tight text-landing-foreground lowercase">
+                            armillary software
+                        </h1>
+                    </div>
                 </header>
 
-                <main className="flex flex-1 flex-col items-center px-6 pt-[22vh] sm:pt-[24vh]">
-                    <h1 className="text-center font-wordmark text-[clamp(1.75rem,6vw,3.75rem)] leading-none tracking-tight text-landing-foreground lowercase">
-                        armillary software
-                    </h1>
-                    <div className="mt-8 flex w-full justify-center sm:mt-11">
-                        <ArmillarySphere />
+                <main className="flex min-h-0 w-full flex-1 flex-col px-6">
+                    <div
+                        className={`relative flex min-h-0 w-full flex-1 flex-col items-center justify-center gap-8 ${appLocal ? 'lg:flex-row lg:gap-10' : ''}`}
+                    >
+                        {appLocal ? (
+                            <ArmillaryHeerichDevDashboard
+                                value={armillaryDevConfig}
+                                onChange={setArmillaryDevConfig}
+                            />
+                        ) : null}
+                        <div className="flex min-w-3/4 shrink-0 justify-center">
+                            <ArmillarySphere
+                                config={
+                                    appLocal ? armillaryDevConfig : undefined
+                                }
+                            />
+                        </div>
                     </div>
                 </main>
 
-                <footer className="flex justify-center gap-8 px-6 pt-8 pb-10 font-ui text-sm text-muted-foreground">
+                <footer className="mt-auto flex shrink-0 justify-center gap-8 px-6 pt-8 pb-10 font-ui text-sm text-muted-foreground">
                     <a
                         href="https://joelchristensen.dev"
                         target="_blank"

@@ -44,6 +44,9 @@ importers:
       geist:
         specifier: ^1.7.0
         version: 1.7.0(next@16.2.1(@babel/core@7.29.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))
+      heerich:
+        specifier: ^0.1.0
+        version: 0.1.0
       laravel-vite-plugin:
         specifier: ^3.0.0
         version: 3.0.0(vite@8.0.3(@emnapi/core@1.9.1)(@emnapi/runtime@1.9.1)(@types/node@22.19.15)(jiti@2.6.1))
@@ -1919,6 +1922,9 @@ packages:
 
   headers-polyfill@4.0.3:
     resolution: {integrity: sha512-IScLbePpkvO846sIwOtOTDjutRMWdXdJmXdMvk6gCBHxFO8d+QKOQedyZSxFTTFYRSmlgSTDtXqqq4pcenBXLQ==}
+
+  heerich@0.1.0:
+    resolution: {integrity: sha512-Haq1UmqviAzcTlfw/vHHd7yHxdZgWDLM6I5QPho2cHRKGWSU5VD/7owZiAxjBvAZVeeMXcclM+/bMgKGzLJCZA==}
 
   hono@4.12.9:
     resolution: {integrity: sha512-wy3T8Zm2bsEvxKZM5w21VdHDDcwVS1yUFFY6i8UobSsKfFceT7TOwhbhfKsDyx7tYQlmRM5FLpIuYvNFyjctiA==}
@@ -4581,6 +4587,8 @@ snapshots:
       function-bind: 1.1.2
 
   headers-polyfill@4.0.3: {}
+
+  heerich@0.1.0: {}
 
   hono@4.12.9: {}
 
