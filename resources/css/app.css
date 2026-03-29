@@ -26,9 +26,7 @@
         'Geist Pixel Circle', 'Geist Variable', ui-sans-serif, system-ui,
         sans-serif;
     --font-ui: 'Geist Variable', ui-sans-serif, system-ui, sans-serif;
-    --ease-landing-out: cubic-bezier(0.23, 1, 0.32, 1);
-    --color-landing: oklch(0.985 0.002 75);
-    --color-landing-foreground: oklch(0.18 0.01 75);
+    --ease-out-soft: cubic-bezier(0.23, 1, 0.32, 1);
 }
 
 @theme inline {
@@ -324,7 +322,7 @@
 .dark {
     --background: var(--abyss);
     --foreground: var(--lightspeed);
-    --card: var(--abyss);
+    --card: var(--nordic);
     --card-foreground: var(--lightspeed);
     --popover: var(--abyss);
     --popover-foreground: var(--lightspeed);
@@ -384,16 +382,25 @@
 }
 
 @layer base {
+    html {
+        font-weight: 500;
+        color-scheme: light;
+        -webkit-tap-highlight-color: color-mix(
+            in srgb,
+            var(--ring) 22%,
+            transparent
+        );
+        @apply font-sans;
+    }
+    html.dark {
+        color-scheme: dark;
+    }
     body {
         letter-spacing: var(--tracking-normal);
         @apply bg-background text-foreground;
     }
     * {
         @apply border-border outline-ring/50;
-    }
-    html {
-        font-weight: 500;
-        @apply font-sans;
     }
 }
 
@@ -405,24 +412,30 @@
         font-family: var(--font-ui);
     }
 
-    .bg-landing {
-        background-color: var(--color-landing);
-    }
-    .text-landing-foreground {
-        color: var(--color-landing-foreground);
-    }
-
     .brand-menu-popup {
         transform-origin: var(--transform-origin);
+        overscroll-behavior: contain;
         transition:
-            opacity 180ms var(--ease-landing-out),
-            transform 180ms var(--ease-landing-out);
+            opacity 180ms var(--ease-out-soft),
+            transform 180ms var(--ease-out-soft);
     }
 
     .brand-menu-popup[data-starting-style],
     .brand-menu-popup[data-ending-style] {
         opacity: 0;
         transform: scale(0.97);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .brand-menu-popup {
+            transition: none;
+        }
+
+        .brand-menu-popup[data-starting-style],
+        .brand-menu-popup[data-ending-style] {
+            opacity: 1;
+            transform: none;
+        }
     }
 
     .brand-menu-popup[data-instant] {

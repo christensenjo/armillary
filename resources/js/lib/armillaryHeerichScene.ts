@@ -113,6 +113,26 @@ export type ArmillaryHeerichConfig = {
     axisStroke: string;
 };
 
+/** Keys merged in dark mode (`ARMILLARY_DARK_APPEARANCE_OVERRIDES`). */
+export const ARMILLARY_HEERICH_COLOR_KEYS = [
+    'globeFill',
+    'globeStroke',
+    'meridianRingFill',
+    'meridianRingStroke',
+    'equatorRingFill',
+    'equatorRingStroke',
+    'eclipticRingFill',
+    'eclipticRingStroke',
+    'axisFill',
+    'axisStroke',
+] as const;
+
+/** Dark mode: full color set applied on top of geometry from the light base. */
+export type ArmillaryHeerichDarkAppearance = Pick<
+    ArmillaryHeerichConfig,
+    (typeof ARMILLARY_HEERICH_COLOR_KEYS)[number]
+>;
+
 /** Light-mode fills aligned with brand abyss / nordic for theme switching. */
 export const ARMILLARY_LIGHT_ECLIPTIC_FILL = '#0C1B15';
 export const ARMILLARY_LIGHT_AXIS_FILL = '#1D393C';
@@ -149,6 +169,20 @@ export const DEFAULT_ARMILLARY_HEERICH_CONFIG: ArmillaryHeerichConfig = {
     axisStroke: '#ffffff',
 };
 
+export const ARMILLARY_DARK_APPEARANCE_OVERRIDES: ArmillaryHeerichDarkAppearance =
+    {
+        globeFill: 'var(--grape)',
+        globeStroke: 'var(--abyss)',
+        meridianRingFill: 'var(--nordic)',
+        meridianRingStroke: 'var(--mist)',
+        equatorRingFill: 'var(--mist)',
+        equatorRingStroke: 'var(--nordic)',
+        eclipticRingFill: 'var(--abyss)',
+        eclipticRingStroke: 'var(--grape)',
+        axisFill: 'var(--lightspeed)',
+        axisStroke: 'var(--abyss)',
+    };
+
 /** CSS `var(--token)` values wired in `app.css`; safe for inline SVG fills. */
 export const ARMILLARY_BRAND_COLOR_SWATCHES = [
     { label: 'Pearl', value: 'var(--pearl)' },
@@ -160,12 +194,12 @@ export const ARMILLARY_BRAND_COLOR_SWATCHES = [
 ] as const;
 
 /**
- * Dark mode: ecliptic (abyss) → lightspeed, polar axis (nordic) → white.
- * Other colors stay as configured for light.
+ * Dark mode: merge full dark color set (`ARMILLARY_DARK_APPEARANCE_OVERRIDES` or dev preview).
  */
 export function mergeArmillaryThemeAppearance(
     config: ArmillaryHeerichConfig,
     isDark: boolean,
+    darkAppearance: ArmillaryHeerichDarkAppearance = ARMILLARY_DARK_APPEARANCE_OVERRIDES,
 ): ArmillaryHeerichConfig {
     if (!isDark) {
         return config;
@@ -173,8 +207,7 @@ export function mergeArmillaryThemeAppearance(
 
     return {
         ...config,
-        eclipticRingFill: 'var(--lightspeed)',
-        axisFill: '#ffffff',
+        ...darkAppearance,
     };
 }
 
@@ -194,7 +227,7 @@ export function formatArmillaryConfigForPaste(
     const lines = [
         "import type { ArmillaryHeerichConfig } from '@/lib/armillaryHeerichScene';",
         '',
-        '// Replace DEFAULT_ARMILLARY_HEERICH_CONFIG in armillaryHeerichScene.ts',
+        '// Light / base config — replace DEFAULT_ARMILLARY_HEERICH_CONFIG in armillaryHeerichScene.ts',
         'export const DEFAULT_ARMILLARY_HEERICH_CONFIG: ArmillaryHeerichConfig = {',
     ];
 
@@ -202,6 +235,30 @@ export function formatArmillaryConfigForPaste(
         keyof ArmillaryHeerichConfig
     >) {
         lines.push(`    ${key}: ${JSON.stringify(config[key])},`);
+    }
+
+    lines.push('};', '');
+
+    return lines.join('\n');
+}
+
+/**
+ * TypeScript snippet for dark-mode color overrides (replace
+ * `ARMILLARY_DARK_APPEARANCE_OVERRIDES`).
+ */
+export function formatArmillaryDarkAppearanceForPaste(
+    appearance: ArmillaryHeerichDarkAppearance,
+): string {
+    const lines = [
+        "import type { ArmillaryHeerichDarkAppearance } from '@/lib/armillaryHeerichScene';",
+        '',
+        '// Dark mode — merged on top of the base config when `.dark` is active',
+        '// Replace ARMILLARY_DARK_APPEARANCE_OVERRIDES in armillaryHeerichScene.ts',
+        'export const ARMILLARY_DARK_APPEARANCE_OVERRIDES: ArmillaryHeerichDarkAppearance = {',
+    ];
+
+    for (const key of ARMILLARY_HEERICH_COLOR_KEYS) {
+        lines.push(`    ${key}: ${JSON.stringify(appearance[key])},`);
     }
 
     lines.push('};', '');

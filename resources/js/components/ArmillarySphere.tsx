@@ -5,20 +5,14 @@ import {
     mergeArmillaryConfig,
     mergeArmillaryThemeAppearance,
 } from '@/lib/armillaryHeerichScene';
-import type { ArmillaryHeerichConfig } from '@/lib/armillaryHeerichScene';
-
-function subscribeDocumentDarkClass(cb: () => void): () => void {
-    const el = document.documentElement;
-    const mo = new MutationObserver(cb);
-
-    mo.observe(el, { attributes: true, attributeFilter: ['class'] });
-
-    return () => mo.disconnect();
-}
-
-function snapshotDocumentDark(): boolean {
-    return document.documentElement.classList.contains('dark');
-}
+import type {
+    ArmillaryHeerichConfig,
+    ArmillaryHeerichDarkAppearance,
+} from '@/lib/armillaryHeerichScene';
+import {
+    snapshotDocumentDark,
+    subscribeDocumentDarkClass,
+} from '@/lib/theme';
 
 function injectSvgPresentationClass(svg: string, className: string): string {
     return svg.replace('<svg ', `<svg class="${className}" fill="none" `);
@@ -26,9 +20,14 @@ function injectSvgPresentationClass(svg: string, className: string): string {
 
 type ArmillarySphereProps = {
     config?: Partial<ArmillaryHeerichConfig>;
+    /** Dev-only: preview dark overrides without editing the bundled constant. */
+    darkAppearance?: ArmillaryHeerichDarkAppearance;
 };
 
-export function ArmillarySphere({ config }: ArmillarySphereProps) {
+export function ArmillarySphere({
+    config,
+    darkAppearance,
+}: ArmillarySphereProps) {
     const isDark = useSyncExternalStore(
         subscribeDocumentDarkClass,
         snapshotDocumentDark,
@@ -37,8 +36,9 @@ export function ArmillarySphere({ config }: ArmillarySphereProps) {
 
     const merged = useMemo(() => mergeArmillaryConfig(config), [config]);
     const themed = useMemo(
-        () => mergeArmillaryThemeAppearance(merged, isDark),
-        [merged, isDark],
+        () =>
+            mergeArmillaryThemeAppearance(merged, isDark, darkAppearance),
+        [merged, isDark, darkAppearance],
     );
     const svgHtml = useMemo(() => buildArmillarySvgString(themed), [themed]);
 
@@ -53,7 +53,7 @@ export function ArmillarySphere({ config }: ArmillarySphereProps) {
 
     return (
         <div
-            className="w-[min(92vw,28rem)] max-w-full touch-pan-y select-none"
+            className="w-[min(92vw,28rem)] max-w-full touch-manipulation select-none"
             role="img"
             aria-label="Armillary sphere — voxel illustration of nested celestial rings"
         >

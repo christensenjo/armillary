@@ -3,6 +3,7 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#faf9f6">
         <script>
             (function () {
                 try {
@@ -14,6 +15,13 @@
                             window.matchMedia('(prefers-color-scheme: dark)')
                                 .matches);
                     document.documentElement.classList.toggle('dark', dark);
+                    var m = document.querySelector('meta[name="theme-color"]');
+                    if (m) {
+                        m.setAttribute(
+                            'content',
+                            dark ? '#1e2524' : '#faf9f6',
+                        );
+                    }
                 } catch (e) {}
             })();
         </script>
