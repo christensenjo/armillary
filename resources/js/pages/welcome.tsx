@@ -14,6 +14,8 @@ import type {
     ArmillaryHeerichConfig,
     ArmillaryHeerichDarkAppearance,
 } from '@/lib/armillaryHeerichScene';
+import { mergeArmillaryMotionRig } from '@/lib/armillaryMotionRig';
+import type { ArmillaryMotionRigConfig } from '@/lib/armillaryMotionRig';
 
 export default function Welcome() {
     const { appLocal } = usePage().props;
@@ -25,6 +27,8 @@ export default function Welcome() {
         useState<ArmillaryHeerichDarkAppearance>(() => ({
             ...ARMILLARY_DARK_APPEARANCE_OVERRIDES,
         }));
+    const [armillaryMotionRig, setArmillaryMotionRig] =
+        useState<ArmillaryMotionRigConfig>(() => mergeArmillaryMotionRig());
 
     return (
         <>
@@ -68,6 +72,8 @@ export default function Welcome() {
                                 onDarkAppearanceChange={
                                     setArmillaryDarkAppearance
                                 }
+                                motionRig={armillaryMotionRig}
+                                onMotionRigChange={setArmillaryMotionRig}
                             />
                         ) : null}
                         <div
@@ -83,6 +89,11 @@ export default function Welcome() {
                                     darkAppearance={
                                         appLocal
                                             ? armillaryDarkAppearance
+                                            : undefined
+                                    }
+                                    motionRig={
+                                        appLocal
+                                            ? armillaryMotionRig
                                             : undefined
                                     }
                                 />

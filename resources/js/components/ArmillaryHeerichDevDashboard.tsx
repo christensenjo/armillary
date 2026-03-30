@@ -22,6 +22,8 @@ import type {
     ArmillaryHeerichConfig,
     ArmillaryHeerichDarkAppearance,
 } from '@/lib/armillaryHeerichScene';
+import { mergeArmillaryMotionRig } from '@/lib/armillaryMotionRig';
+import type { ArmillaryMotionRigConfig } from '@/lib/armillaryMotionRig';
 import { snapshotDocumentDark, subscribeDocumentDarkClass } from '@/lib/theme';
 
 type SliderSpec = {
@@ -244,6 +246,8 @@ type ArmillaryHeerichDevDashboardProps = {
     onChange: (next: ArmillaryHeerichConfig) => void;
     darkAppearance: ArmillaryHeerichDarkAppearance;
     onDarkAppearanceChange: (next: ArmillaryHeerichDarkAppearance) => void;
+    motionRig: ArmillaryMotionRigConfig;
+    onMotionRigChange: (next: ArmillaryMotionRigConfig) => void;
 };
 
 export function ArmillaryHeerichDevDashboard({
@@ -251,6 +255,8 @@ export function ArmillaryHeerichDevDashboard({
     onChange,
     darkAppearance,
     onDarkAppearanceChange,
+    motionRig,
+    onMotionRigChange,
 }: ArmillaryHeerichDevDashboardProps) {
     const baseId = useId();
     const panelRef = useRef<HTMLElement | null>(null);
@@ -293,12 +299,53 @@ export function ArmillaryHeerichDevDashboard({
         [darkAppearance, isDark, onChange, onDarkAppearanceChange, value],
     );
 
+    const setEntrance = useCallback(
+        (patch: Partial<ArmillaryMotionRigConfig['entrance']>) => {
+            onMotionRigChange({
+                ...motionRig,
+                entrance: { ...motionRig.entrance, ...patch },
+            });
+        },
+        [motionRig, onMotionRigChange],
+    );
+
+    const setHoverMotion = useCallback(
+        (patch: Partial<ArmillaryMotionRigConfig['hover']>) => {
+            onMotionRigChange({
+                ...motionRig,
+                hover: { ...motionRig.hover, ...patch },
+            });
+        },
+        [motionRig, onMotionRigChange],
+    );
+
+    const setDragMotion = useCallback(
+        (patch: Partial<ArmillaryMotionRigConfig['drag']>) => {
+            onMotionRigChange({
+                ...motionRig,
+                drag: { ...motionRig.drag, ...patch },
+            });
+        },
+        [motionRig, onMotionRigChange],
+    );
+
+    const setPerfMotion = useCallback(
+        (patch: Partial<ArmillaryMotionRigConfig['performance']>) => {
+            onMotionRigChange({
+                ...motionRig,
+                performance: { ...motionRig.performance, ...patch },
+            });
+        },
+        [motionRig, onMotionRigChange],
+    );
+
     const reset = useCallback(() => {
         onChange({ ...DEFAULT_ARMILLARY_HEERICH_CONFIG });
         onDarkAppearanceChange({
             ...ARMILLARY_DARK_APPEARANCE_OVERRIDES,
         });
-    }, [onChange, onDarkAppearanceChange]);
+        onMotionRigChange(mergeArmillaryMotionRig());
+    }, [onChange, onDarkAppearanceChange, onMotionRigChange]);
 
     const copyConfig = useCallback(async () => {
         const text = isDark
@@ -588,6 +635,522 @@ export function ArmillaryHeerichDevDashboard({
                                 </div>
                             );
                         })}
+                    </section>
+
+                    <section className="mb-4 space-y-3 border-b border-border pb-4 dark:border-abyss/35">
+                        <h3 className="font-ui text-[0.65rem] font-semibold tracking-wide text-muted-foreground uppercase dark:text-pearl-300/95">
+                            Motion rig
+                        </h3>
+                        <div className="space-y-2 rounded-md border border-border/60 bg-muted/25 p-2 dark:border-abyss/40">
+                            <label className="flex cursor-pointer items-center gap-2 font-ui text-[0.7rem] text-foreground">
+                                <input
+                                    type="checkbox"
+                                    checked={motionRig.entrance.enabled}
+                                    onChange={(e) =>
+                                        setEntrance({
+                                            enabled: e.target.checked,
+                                        })
+                                    }
+                                    className="size-3.5 shrink-0 accent-foreground dark:accent-mist"
+                                />
+                                Entrance animation
+                            </label>
+                            <div className="space-y-1">
+                                <div className="flex justify-between gap-2 font-ui text-[0.7rem]">
+                                    <span className="text-foreground">
+                                        Entrance duration (ms)
+                                    </span>
+                                    <span className="text-muted-foreground tabular-nums">
+                                        {motionRig.entrance.durationMs}
+                                    </span>
+                                </div>
+                                <input
+                                    type="range"
+                                    min={200}
+                                    max={2200}
+                                    step={20}
+                                    value={motionRig.entrance.durationMs}
+                                    onChange={(e) =>
+                                        setEntrance({
+                                            durationMs: Number.parseInt(
+                                                e.target.value,
+                                                10,
+                                            ),
+                                        })
+                                    }
+                                    className="h-2 w-full cursor-pointer accent-foreground dark:accent-mist"
+                                />
+                            </div>
+                            <div className="space-y-1">
+                                <div className="flex justify-between gap-2 font-ui text-[0.7rem]">
+                                    <span className="text-foreground">
+                                        Initial yaw offset (°)
+                                    </span>
+                                    <span className="text-muted-foreground tabular-nums">
+                                        {motionRig.entrance.initialYawOffsetDeg}
+                                    </span>
+                                </div>
+                                <input
+                                    type="range"
+                                    min={-40}
+                                    max={40}
+                                    step={0.5}
+                                    value={
+                                        motionRig.entrance.initialYawOffsetDeg
+                                    }
+                                    onChange={(e) =>
+                                        setEntrance({
+                                            initialYawOffsetDeg:
+                                                Number.parseFloat(
+                                                    e.target.value,
+                                                ),
+                                        })
+                                    }
+                                    className="h-2 w-full cursor-pointer accent-foreground dark:accent-mist"
+                                />
+                            </div>
+                            <div className="space-y-1">
+                                <div className="flex justify-between gap-2 font-ui text-[0.7rem]">
+                                    <span className="text-foreground">
+                                        Initial ecliptic offset (°)
+                                    </span>
+                                    <span className="text-muted-foreground tabular-nums">
+                                        {
+                                            motionRig.entrance
+                                                .initialEclipticOffsetDeg
+                                        }
+                                    </span>
+                                </div>
+                                <input
+                                    type="range"
+                                    min={-25}
+                                    max={25}
+                                    step={0.25}
+                                    value={
+                                        motionRig.entrance
+                                            .initialEclipticOffsetDeg
+                                    }
+                                    onChange={(e) =>
+                                        setEntrance({
+                                            initialEclipticOffsetDeg:
+                                                Number.parseFloat(
+                                                    e.target.value,
+                                                ),
+                                        })
+                                    }
+                                    className="h-2 w-full cursor-pointer accent-foreground dark:accent-mist"
+                                />
+                            </div>
+                            <div className="space-y-1">
+                                <div className="flex justify-between gap-2 font-ui text-[0.7rem]">
+                                    <span className="text-foreground">
+                                        Initial camera offset (°)
+                                    </span>
+                                    <span className="text-muted-foreground tabular-nums">
+                                        {
+                                            motionRig.entrance
+                                                .initialCameraAngleOffsetDeg
+                                        }
+                                    </span>
+                                </div>
+                                <input
+                                    type="range"
+                                    min={-28}
+                                    max={28}
+                                    step={0.5}
+                                    value={
+                                        motionRig.entrance
+                                            .initialCameraAngleOffsetDeg
+                                    }
+                                    onChange={(e) =>
+                                        setEntrance({
+                                            initialCameraAngleOffsetDeg:
+                                                Number.parseFloat(
+                                                    e.target.value,
+                                                ),
+                                        })
+                                    }
+                                    className="h-2 w-full cursor-pointer accent-foreground dark:accent-mist"
+                                />
+                            </div>
+                        </div>
+                        <div className="space-y-2 rounded-md border border-border/60 bg-muted/25 p-2 dark:border-abyss/40">
+                            <label className="flex cursor-pointer items-center gap-2 font-ui text-[0.7rem] text-foreground">
+                                <input
+                                    type="checkbox"
+                                    checked={motionRig.hover.enabled}
+                                    onChange={(e) =>
+                                        setHoverMotion({
+                                            enabled: e.target.checked,
+                                        })
+                                    }
+                                    className="size-3.5 shrink-0"
+                                />
+                                Hover (fine pointer)
+                            </label>
+                            <div className="space-y-1">
+                                <div className="flex justify-between gap-2 font-ui text-[0.7rem]">
+                                    <span className="text-foreground">
+                                        Hover smoothing
+                                    </span>
+                                    <span className="text-muted-foreground tabular-nums">
+                                        {motionRig.hover.smoothing}
+                                    </span>
+                                </div>
+                                <input
+                                    type="range"
+                                    min={2}
+                                    max={32}
+                                    step={0.5}
+                                    value={motionRig.hover.smoothing}
+                                    onChange={(e) =>
+                                        setHoverMotion({
+                                            smoothing: Number.parseFloat(
+                                                e.target.value,
+                                            ),
+                                        })
+                                    }
+                                    className="h-2 w-full cursor-pointer accent-foreground dark:accent-mist"
+                                />
+                            </div>
+                            <div className="space-y-1">
+                                <div className="flex justify-between gap-2 font-ui text-[0.7rem]">
+                                    <span className="text-foreground">
+                                        Max hover camera (°)
+                                    </span>
+                                    <span className="text-muted-foreground tabular-nums">
+                                        {motionRig.hover.maxCameraDeg}
+                                    </span>
+                                </div>
+                                <input
+                                    type="range"
+                                    min={0}
+                                    max={16}
+                                    step={0.25}
+                                    value={motionRig.hover.maxCameraDeg}
+                                    onChange={(e) =>
+                                        setHoverMotion({
+                                            maxCameraDeg: Number.parseFloat(
+                                                e.target.value,
+                                            ),
+                                        })
+                                    }
+                                    className="h-2 w-full cursor-pointer accent-foreground dark:accent-mist"
+                                />
+                            </div>
+                            <div className="space-y-1">
+                                <div className="flex justify-between gap-2 font-ui text-[0.7rem]">
+                                    <span className="text-foreground">
+                                        Max hover yaw (°)
+                                    </span>
+                                    <span className="text-muted-foreground tabular-nums">
+                                        {motionRig.hover.maxYawDeg}
+                                    </span>
+                                </div>
+                                <input
+                                    type="range"
+                                    min={0}
+                                    max={8}
+                                    step={0.1}
+                                    value={motionRig.hover.maxYawDeg}
+                                    onChange={(e) =>
+                                        setHoverMotion({
+                                            maxYawDeg: Number.parseFloat(
+                                                e.target.value,
+                                            ),
+                                        })
+                                    }
+                                    className="h-2 w-full cursor-pointer accent-foreground dark:accent-mist"
+                                />
+                            </div>
+                            <div className="space-y-1">
+                                <div className="flex justify-between gap-2 font-ui text-[0.7rem]">
+                                    <span className="text-foreground">
+                                        Max hover ecliptic (°)
+                                    </span>
+                                    <span className="text-muted-foreground tabular-nums">
+                                        {motionRig.hover.maxEclipticDeg}
+                                    </span>
+                                </div>
+                                <input
+                                    type="range"
+                                    min={0}
+                                    max={6}
+                                    step={0.05}
+                                    value={motionRig.hover.maxEclipticDeg}
+                                    onChange={(e) =>
+                                        setHoverMotion({
+                                            maxEclipticDeg: Number.parseFloat(
+                                                e.target.value,
+                                            ),
+                                        })
+                                    }
+                                    className="h-2 w-full cursor-pointer accent-foreground dark:accent-mist"
+                                />
+                            </div>
+                            <div className="space-y-1">
+                                <div className="flex justify-between gap-2 font-ui text-[0.7rem]">
+                                    <span className="text-foreground">
+                                        Max hover polar tilt (°)
+                                    </span>
+                                    <span className="text-muted-foreground tabular-nums">
+                                        {motionRig.hover.maxPolarTiltDeg}
+                                    </span>
+                                </div>
+                                <input
+                                    type="range"
+                                    min={0}
+                                    max={5}
+                                    step={0.05}
+                                    value={motionRig.hover.maxPolarTiltDeg}
+                                    onChange={(e) =>
+                                        setHoverMotion({
+                                            maxPolarTiltDeg: Number.parseFloat(
+                                                e.target.value,
+                                            ),
+                                        })
+                                    }
+                                    className="h-2 w-full cursor-pointer accent-foreground dark:accent-mist"
+                                />
+                            </div>
+                        </div>
+                        <div className="space-y-2 rounded-md border border-border/60 bg-muted/25 p-2 dark:border-abyss/40">
+                            <p className="font-ui text-[0.65rem] font-medium text-muted-foreground uppercase">
+                                Drag / inertia
+                            </p>
+                            <div className="space-y-1">
+                                <div className="flex justify-between gap-2 font-ui text-[0.7rem]">
+                                    <span className="text-foreground">
+                                        Yaw sensitivity
+                                    </span>
+                                    <span className="text-muted-foreground tabular-nums">
+                                        {motionRig.drag.yawSensitivity}
+                                    </span>
+                                </div>
+                                <input
+                                    type="range"
+                                    min={0.02}
+                                    max={0.35}
+                                    step={0.01}
+                                    value={motionRig.drag.yawSensitivity}
+                                    onChange={(e) =>
+                                        setDragMotion({
+                                            yawSensitivity: Number.parseFloat(
+                                                e.target.value,
+                                            ),
+                                        })
+                                    }
+                                    className="h-2 w-full cursor-pointer accent-foreground dark:accent-mist"
+                                />
+                            </div>
+                            <div className="space-y-1">
+                                <div className="flex justify-between gap-2 font-ui text-[0.7rem]">
+                                    <span className="text-foreground">
+                                        Camera mix (0=yaw, 1=camera)
+                                    </span>
+                                    <span className="text-muted-foreground tabular-nums">
+                                        {motionRig.drag.cameraMix}
+                                    </span>
+                                </div>
+                                <input
+                                    type="range"
+                                    min={0}
+                                    max={1}
+                                    step={0.05}
+                                    value={motionRig.drag.cameraMix}
+                                    onChange={(e) =>
+                                        setDragMotion({
+                                            cameraMix: Number.parseFloat(
+                                                e.target.value,
+                                            ),
+                                        })
+                                    }
+                                    className="h-2 w-full cursor-pointer accent-foreground dark:accent-mist"
+                                />
+                            </div>
+                            <div className="space-y-1">
+                                <div className="flex justify-between gap-2 font-ui text-[0.7rem]">
+                                    <span className="text-foreground">
+                                        Ecliptic mix
+                                    </span>
+                                    <span className="text-muted-foreground tabular-nums">
+                                        {motionRig.drag.eclipticMix}
+                                    </span>
+                                </div>
+                                <input
+                                    type="range"
+                                    min={0}
+                                    max={1.2}
+                                    step={0.05}
+                                    value={motionRig.drag.eclipticMix}
+                                    onChange={(e) =>
+                                        setDragMotion({
+                                            eclipticMix: Number.parseFloat(
+                                                e.target.value,
+                                            ),
+                                        })
+                                    }
+                                    className="h-2 w-full cursor-pointer accent-foreground dark:accent-mist"
+                                />
+                            </div>
+                            <div className="space-y-1">
+                                <div className="flex justify-between gap-2 font-ui text-[0.7rem]">
+                                    <span className="text-foreground">
+                                        Polar tilt / px
+                                    </span>
+                                    <span className="text-muted-foreground tabular-nums">
+                                        {motionRig.drag.polarAxisTiltPerPx}
+                                    </span>
+                                </div>
+                                <input
+                                    type="range"
+                                    min={0.01}
+                                    max={0.12}
+                                    step={0.005}
+                                    value={motionRig.drag.polarAxisTiltPerPx}
+                                    onChange={(e) =>
+                                        setDragMotion({
+                                            polarAxisTiltPerPx:
+                                                Number.parseFloat(
+                                                    e.target.value,
+                                                ),
+                                        })
+                                    }
+                                    className="h-2 w-full cursor-pointer accent-foreground dark:accent-mist"
+                                />
+                            </div>
+                            <div className="space-y-1">
+                                <div className="flex justify-between gap-2 font-ui text-[0.7rem]">
+                                    <span className="text-foreground">
+                                        Friction / frame
+                                    </span>
+                                    <span className="text-muted-foreground tabular-nums">
+                                        {motionRig.drag.friction}
+                                    </span>
+                                </div>
+                                <input
+                                    type="range"
+                                    min={0.75}
+                                    max={0.99}
+                                    step={0.005}
+                                    value={motionRig.drag.friction}
+                                    onChange={(e) =>
+                                        setDragMotion({
+                                            friction: Number.parseFloat(
+                                                e.target.value,
+                                            ),
+                                        })
+                                    }
+                                    className="h-2 w-full cursor-pointer accent-foreground dark:accent-mist"
+                                />
+                            </div>
+                            <div className="space-y-1">
+                                <div className="flex justify-between gap-2 font-ui text-[0.7rem]">
+                                    <span className="text-foreground">
+                                        Inertia gain
+                                    </span>
+                                    <span className="text-muted-foreground tabular-nums">
+                                        {motionRig.drag.velocityGain}
+                                    </span>
+                                </div>
+                                <input
+                                    type="range"
+                                    min={0.3}
+                                    max={2.5}
+                                    step={0.05}
+                                    value={motionRig.drag.velocityGain}
+                                    onChange={(e) =>
+                                        setDragMotion({
+                                            velocityGain: Number.parseFloat(
+                                                e.target.value,
+                                            ),
+                                        })
+                                    }
+                                    className="h-2 w-full cursor-pointer accent-foreground dark:accent-mist"
+                                />
+                            </div>
+                            <div className="space-y-1">
+                                <div className="flex justify-between gap-2 font-ui text-[0.7rem]">
+                                    <span className="text-foreground">
+                                        Max tilt offset (°)
+                                    </span>
+                                    <span className="text-muted-foreground tabular-nums">
+                                        {motionRig.drag.maxTiltOffsetDeg}
+                                    </span>
+                                </div>
+                                <input
+                                    type="range"
+                                    min={2}
+                                    max={18}
+                                    step={0.5}
+                                    value={motionRig.drag.maxTiltOffsetDeg}
+                                    onChange={(e) =>
+                                        setDragMotion({
+                                            maxTiltOffsetDeg: Number.parseFloat(
+                                                e.target.value,
+                                            ),
+                                        })
+                                    }
+                                    className="h-2 w-full cursor-pointer accent-foreground dark:accent-mist"
+                                />
+                            </div>
+                        </div>
+                        <div className="space-y-2 rounded-md border border-border/60 bg-muted/25 p-2 dark:border-abyss/40">
+                            <p className="font-ui text-[0.65rem] font-medium text-muted-foreground uppercase">
+                                Performance
+                            </p>
+                            <div className="space-y-1">
+                                <div className="flex justify-between gap-2 font-ui text-[0.7rem]">
+                                    <span className="text-foreground">
+                                        Min frame (ms)
+                                    </span>
+                                    <span className="text-muted-foreground tabular-nums">
+                                        {motionRig.performance.minFrameMs}
+                                    </span>
+                                </div>
+                                <input
+                                    type="range"
+                                    min={8}
+                                    max={80}
+                                    step={1}
+                                    value={motionRig.performance.minFrameMs}
+                                    onChange={(e) =>
+                                        setPerfMotion({
+                                            minFrameMs: Number.parseInt(
+                                                e.target.value,
+                                                10,
+                                            ),
+                                        })
+                                    }
+                                    className="h-2 w-full cursor-pointer accent-foreground dark:accent-mist"
+                                />
+                            </div>
+                            <div className="space-y-1">
+                                <div className="flex justify-between gap-2 font-ui text-[0.7rem]">
+                                    <span className="text-foreground">
+                                        Rebuild epsilon
+                                    </span>
+                                    <span className="text-muted-foreground tabular-nums">
+                                        {motionRig.performance.epsilon}
+                                    </span>
+                                </div>
+                                <input
+                                    type="range"
+                                    min={0.01}
+                                    max={0.35}
+                                    step={0.01}
+                                    value={motionRig.performance.epsilon}
+                                    onChange={(e) =>
+                                        setPerfMotion({
+                                            epsilon: Number.parseFloat(
+                                                e.target.value,
+                                            ),
+                                        })
+                                    }
+                                    className="h-2 w-full cursor-pointer accent-foreground dark:accent-mist"
+                                />
+                            </div>
+                        </div>
                     </section>
 
                     <div className="space-y-3">
