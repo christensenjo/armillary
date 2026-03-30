@@ -17,9 +17,13 @@ on:
 jobs:
   ci:
     runs-on: ubuntu-latest
+    # Laravel 13 / Symfony 8 require PHP >= 8.4; keep matrix in sync with composer.lock.
     strategy:
       matrix:
-        php-version: ['8.3', '8.4', '8.5']
+        php-version: ['8.4', '8.5']
+
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
     steps:
       - name: Checkout code
