@@ -1,3 +1,4 @@
+import { GripVertical } from 'lucide-react';
 import {
     useCallback,
     useId,
@@ -8,7 +9,6 @@ import {
     useSyncExternalStore,
 } from 'react';
 import type { PointerEvent as ReactPointerEvent } from 'react';
-import { GripVertical } from 'lucide-react';
 
 import {
     ARMILLARY_BRAND_COLOR_SWATCHES,
@@ -253,7 +253,7 @@ export function ArmillaryHeerichDevDashboard({
     onDarkAppearanceChange,
 }: ArmillaryHeerichDevDashboardProps) {
     const baseId = useId();
-    const panelRef = useRef<HTMLAsideElement>(null);
+    const panelRef = useRef<HTMLElement | null>(null);
     const dragOffsetRef = useRef<{ ox: number; oy: number } | null>(null);
     const hasOpenedOnceRef = useRef(false);
 
@@ -328,10 +328,7 @@ export function ArmillaryHeerichDevDashboard({
                         : (parseSolidHexColor(raw) ?? PICKER_HEX_FALLBACK),
                 ];
             }),
-        ) as Record<
-            (typeof ARMILLARY_HEERICH_COLOR_KEYS)[number],
-            string
-        >;
+        ) as Record<(typeof ARMILLARY_HEERICH_COLOR_KEYS)[number], string>;
     }, [canResolveCssColors, darkAppearance, isDark, value]);
 
     const clampPanelPosition = useCallback((x: number, y: number) => {
@@ -350,6 +347,7 @@ export function ArmillaryHeerichDevDashboard({
 
     const handleShowPanel = useCallback(() => {
         setPanelOpen(true);
+
         if (!hasOpenedOnceRef.current && typeof window !== 'undefined') {
             hasOpenedOnceRef.current = true;
             setPanelPosition({
@@ -408,10 +406,7 @@ export function ArmillaryHeerichDevDashboard({
             }
 
             const { ox, oy } = dragOffsetRef.current;
-            const next = clampPanelPosition(
-                e.clientX - ox,
-                e.clientY - oy,
-            );
+            const next = clampPanelPosition(e.clientX - ox, e.clientY - oy);
 
             setPanelPosition(next);
         },
@@ -465,7 +460,7 @@ export function ArmillaryHeerichDevDashboard({
                     aria-label="Armillary sphere development controls"
                 >
                     <div
-                        className="mb-3 flex cursor-grab touch-none flex-wrap items-center gap-2 active:cursor-grabbing select-none"
+                        className="mb-3 flex cursor-grab touch-none flex-wrap items-center gap-2 select-none active:cursor-grabbing"
                         onPointerDown={onDragHandlePointerDown}
                         onPointerMove={onDragHandlePointerMove}
                         onPointerUp={onDragHandlePointerUp}
@@ -473,7 +468,7 @@ export function ArmillaryHeerichDevDashboard({
                         title="Drag to move panel"
                     >
                         <GripVertical
-                            className="size-4 shrink-0 text-muted-foreground opacity-70 pointer-events-none"
+                            className="pointer-events-none size-4 shrink-0 text-muted-foreground opacity-70"
                             aria-hidden
                             strokeWidth={2}
                         />
@@ -507,21 +502,21 @@ export function ArmillaryHeerichDevDashboard({
                             Colors
                         </h3>
                         <p className="font-ui text-[0.65rem] leading-snug text-muted-foreground dark:text-pearl-400/90">
-                        Site is in{' '}
-                        <span className="font-medium text-foreground">
-                            {themeLabel}
-                        </span>{' '}
-                        mode — these controls edit{' '}
-                        <span className="font-medium text-foreground">
-                            {themeLabel}
-                        </span>{' '}
-                        colors. Use the theme control in the header to switch and
-                        tune the other scheme.
-                    </p>
-                    {ARMILLARY_HEERICH_COLOR_KEYS.map((key) => {
-                        const label = ARMILLARY_COLOR_LABELS[key];
-                        const id = `${baseId}-color-${key}`;
-                        const v = isDark ? darkAppearance[key] : value[key];
+                            Site is in{' '}
+                            <span className="font-medium text-foreground">
+                                {themeLabel}
+                            </span>{' '}
+                            mode — these controls edit{' '}
+                            <span className="font-medium text-foreground">
+                                {themeLabel}
+                            </span>{' '}
+                            colors. Use the theme control in the header to
+                            switch and tune the other scheme.
+                        </p>
+                        {ARMILLARY_HEERICH_COLOR_KEYS.map((key) => {
+                            const label = ARMILLARY_COLOR_LABELS[key];
+                            const id = `${baseId}-color-${key}`;
+                            const v = isDark ? darkAppearance[key] : value[key];
 
                             return (
                                 <div key={key} className="space-y-1">
@@ -584,8 +579,7 @@ export function ArmillaryHeerichDevDashboard({
                                                     }
                                                     className="size-5 shrink-0 touch-manipulation rounded-full border border-border shadow-sm ring-offset-2 transition-transform hover:scale-110 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none motion-reduce:transition-none motion-reduce:hover:scale-100"
                                                     style={{
-                                                        backgroundColor:
-                                                            swatch,
+                                                        backgroundColor: swatch,
                                                     }}
                                                 />
                                             ),
@@ -598,8 +592,8 @@ export function ArmillaryHeerichDevDashboard({
 
                     <div className="space-y-3">
                         {SLIDERS.map((spec) => {
-                        const id = `${baseId}-${spec.key}`;
-                        const v = value[spec.key] as number;
+                            const id = `${baseId}-${spec.key}`;
+                            const v = value[spec.key] as number;
 
                             return (
                                 <div key={spec.key} className="space-y-1">

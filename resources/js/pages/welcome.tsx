@@ -5,6 +5,7 @@ import { ArmillaryHeerichDevDashboard } from '@/components/ArmillaryHeerichDevDa
 import { ArmillarySphere } from '@/components/ArmillarySphere';
 import { ClientOnly } from '@/components/ClientOnly';
 import { LogoMenu } from '@/components/LogoMenu';
+import { LinkPreview } from '@/components/ui/link-preview';
 import {
     ARMILLARY_DARK_APPEARANCE_OVERRIDES,
     DEFAULT_ARMILLARY_HEERICH_CONFIG,
@@ -47,7 +48,7 @@ export default function Welcome() {
                         </ClientOnly>
                     </div>
                     <div className="flex shrink-0 justify-start">
-                        <h1 className="text-balance text-center font-wordmark text-[clamp(1.75rem,6vw,3.75rem)] leading-none tracking-tight text-foreground lowercase">
+                        <h1 className="text-center font-wordmark text-[clamp(1.75rem,6vw,3.75rem)] leading-none tracking-tight text-balance text-foreground lowercase">
                             armillary software
                         </h1>
                     </div>
@@ -56,7 +57,7 @@ export default function Welcome() {
                 <main
                     id="main-content"
                     tabIndex={-1}
-                    className="scroll-mt-24 flex min-h-0 w-full flex-1 flex-col px-6 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                    className="flex min-h-0 w-full flex-1 scroll-mt-24 flex-col px-6 outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                 >
                     <div className="relative flex min-h-0 w-full flex-1 flex-col">
                         {appLocal ? (
@@ -91,22 +92,24 @@ export default function Welcome() {
                 </main>
 
                 <footer className="mt-auto flex shrink-0 justify-center gap-8 px-6 pt-8 pb-10 font-ui text-sm text-muted-foreground">
-                    <a
-                        href="https://joelchristensen.dev"
+                    <LinkPreview
+                        url="https://joelchristensen.dev"
                         target="_blank"
                         rel="noopener noreferrer"
                         className="touch-manipulation border-border underline decoration-transparent underline-offset-4 transition-[color,text-decoration-color,transform] duration-150 ease-out hover:text-foreground hover:decoration-current focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none active:scale-[0.97] motion-reduce:active:scale-100"
                     >
                         founder
-                    </a>
-                    <a
-                        href="https://primestats.net"
+                    </LinkPreview>
+                    <LinkPreview
+                        url="https://primestats.net"
+                        isStatic
+                        imageSrc="/images/primestats.png"
                         target="_blank"
                         rel="noopener noreferrer"
                         className="touch-manipulation border-border underline decoration-transparent underline-offset-4 transition-[color,text-decoration-color,transform] duration-150 ease-out hover:text-foreground hover:decoration-current focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none active:scale-[0.97] motion-reduce:active:scale-100"
                     >
                         work
-                    </a>
+                    </LinkPreview>
                 </footer>
             </div>
         </>

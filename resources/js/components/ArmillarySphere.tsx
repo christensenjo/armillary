@@ -9,10 +9,7 @@ import type {
     ArmillaryHeerichConfig,
     ArmillaryHeerichDarkAppearance,
 } from '@/lib/armillaryHeerichScene';
-import {
-    snapshotDocumentDark,
-    subscribeDocumentDarkClass,
-} from '@/lib/theme';
+import { snapshotDocumentDark, subscribeDocumentDarkClass } from '@/lib/theme';
 
 function injectSvgPresentationClass(svg: string, className: string): string {
     return svg.replace('<svg ', `<svg class="${className}" fill="none" `);
@@ -36,8 +33,7 @@ export function ArmillarySphere({
 
     const merged = useMemo(() => mergeArmillaryConfig(config), [config]);
     const themed = useMemo(
-        () =>
-            mergeArmillaryThemeAppearance(merged, isDark, darkAppearance),
+        () => mergeArmillaryThemeAppearance(merged, isDark, darkAppearance),
         [merged, isDark, darkAppearance],
     );
     const svgHtml = useMemo(() => buildArmillarySvgString(themed), [themed]);
