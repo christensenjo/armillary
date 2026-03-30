@@ -169,6 +169,8 @@ export const DEFAULT_ARMILLARY_HEERICH_CONFIG: ArmillaryHeerichConfig = {
     axisStroke: '#ffffff',
 };
 
+// Dark mode — merged on top of the base config when `.dark` is active.
+// Copy into `ARMILLARY_DARK_APPEARANCE_OVERRIDES` in this file if pasting from dev tools.
 export const ARMILLARY_DARK_APPEARANCE_OVERRIDES: ArmillaryHeerichDarkAppearance =
     {
         globeFill: 'var(--grape)',

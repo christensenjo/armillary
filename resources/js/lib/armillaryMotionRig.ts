@@ -29,16 +29,6 @@ export type ArmillaryMotionRigConfig = {
         /** Cubic-bezier for entrance progress (CSS-like, ease-out default). */
         ease: [number, number, number, number];
     };
-    hover: {
-        enabled: boolean;
-        maxCameraDeg: number;
-        maxYawDeg: number;
-        maxEclipticDeg: number;
-        /** Subtle vertical hover lean (polar axis tilt offset). */
-        maxPolarTiltDeg: number;
-        /** Lerp rate toward hover target (~1/s). Higher = snappier. */
-        smoothing: number;
-    };
     drag: {
         /** Degrees of yaw per pixel of horizontal drag. */
         yawSensitivity: number;
@@ -71,14 +61,6 @@ export const DEFAULT_ARMILLARY_MOTION_RIG: ArmillaryMotionRigConfig = {
         initialCameraAngleOffsetDeg: 10,
         ease: [0.23, 1, 0.32, 1],
     },
-    hover: {
-        enabled: true,
-        maxCameraDeg: 5,
-        maxYawDeg: 2.5,
-        maxEclipticDeg: 1.25,
-        maxPolarTiltDeg: 1.5,
-        smoothing: 14,
-    },
     drag: {
         yawSensitivity: 0.12,
         cameraMix: 0.35,
@@ -106,7 +88,6 @@ export function mergeArmillaryMotionRig(
             ...DEFAULT_ARMILLARY_MOTION_RIG.entrance,
             ...partial.entrance,
         },
-        hover: { ...DEFAULT_ARMILLARY_MOTION_RIG.hover, ...partial.hover },
         drag: { ...DEFAULT_ARMILLARY_MOTION_RIG.drag, ...partial.drag },
         performance: {
             ...DEFAULT_ARMILLARY_MOTION_RIG.performance,

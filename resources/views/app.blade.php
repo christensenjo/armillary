@@ -33,6 +33,28 @@
         <meta name="apple-mobile-web-app-title" content="Armillary" />
         <link rel="manifest" href="/brand/site.webmanifest" />
 
+        @php($pageUrl = url()->current())
+        @php($ogImage = url('/images/armillary-opengraph.png'))
+        <link rel="canonical" href="{{ $pageUrl }}" />
+        <meta property="og:site_name" content="{{ config('app.name', 'Armillary Software') }}" />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="{{ $pageUrl }}" />
+        <meta property="og:title" content="{{ config('app.name', 'Armillary Software') }}" />
+        <meta
+            property="og:description"
+            content="Armillary Software — contracting, assets, and deployed software."
+        />
+        <meta property="og:image" content="{{ $ogImage }}" />
+        <meta property="og:image:alt" content="Armillary Software logo and name on a dark teal gradient background." />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="{{ config('app.name', 'Armillary Software') }}" />
+        <meta
+            name="twitter:description"
+            content="Armillary Software — contracting, assets, and deployed software."
+        />
+        <meta name="twitter:image" content="{{ $ogImage }}" />
+        <meta name="twitter:image:alt" content="Armillary Software logo and name on a dark teal gradient background." />
+
         @viteReactRefresh
         @vite(['resources/css/app.css', 'resources/js/app.tsx', "resources/js/pages/{$page['component']}.tsx"])
         <x-inertia::head>

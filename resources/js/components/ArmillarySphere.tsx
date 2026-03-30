@@ -37,28 +37,6 @@ function injectSvgPresentationClass(svg: string, className: string): string {
     return svg.replace('<svg ', `<svg class="${className}" fill="none" `);
 }
 
-const HOVER_MEDIA = '(hover: hover) and (pointer: fine)';
-
-function subscribeHoverCapable(callback: () => void) {
-    if (typeof window === 'undefined') {
-        return () => {};
-    }
-
-    const mq = window.matchMedia(HOVER_MEDIA);
-
-    mq.addEventListener('change', callback);
-
-    return () => mq.removeEventListener('change', callback);
-}
-
-function snapshotHoverCapable() {
-    if (typeof window === 'undefined') {
-        return false;
-    }
-
-    return window.matchMedia(HOVER_MEDIA).matches;
-}
-
 type PointerSample = { x: number; y: number; t: number };
 
 type ArmillarySphereProps = {
@@ -80,11 +58,6 @@ export function ArmillarySphere({
         () => false,
     );
     const reduceMotion = useReducedMotion() ?? false;
-    const canHover = useSyncExternalStore(
-        subscribeHoverCapable,
-        snapshotHoverCapable,
-        () => false,
-    );
 
     const merged = useMemo(() => mergeArmillaryConfig(config), [config]);
     const themed = useMemo(
@@ -97,7 +70,6 @@ export function ArmillarySphere({
         [motionRigPartial],
     );
 
-    const rootRef = useRef<HTMLDivElement>(null);
     const rigRef = useRef(rig);
     const themedRef = useRef(themed);
 
@@ -110,8 +82,6 @@ export function ArmillarySphere({
     }, [themed]);
 
     const dragAccumRef = useRef({ ...ZERO_MOTION_OFFSETS });
-    const hoverTargetRef = useRef({ x: 0, y: 0 });
-    const hoverSmoothedRef = useRef({ x: 0, y: 0 });
     const velRef = useRef({ x: 0, y: 0 });
     const draggingRef = useRef(false);
     const dragPointerIdRef = useRef<number | null>(null);
@@ -189,32 +159,6 @@ export function ArmillarySphere({
                 currentRig.entrance.initialCameraAngleOffsetDeg * f;
         }
 
-        const hover = { ...ZERO_MOTION_OFFSETS };
-
-        if (
-            interactionEnabled &&
-            canHover &&
-            currentRig.hover.enabled &&
-            !reduceMotion &&
-            !draggingRef.current
-        ) {
-            const k =
-                1 - Math.exp(-dt * Math.max(0.01, currentRig.hover.smoothing));
-
-            hoverSmoothedRef.current.x +=
-                (hoverTargetRef.current.x - hoverSmoothedRef.current.x) * k;
-            hoverSmoothedRef.current.y +=
-                (hoverTargetRef.current.y - hoverSmoothedRef.current.y) * k;
-
-            const sx = hoverSmoothedRef.current.x;
-            const sy = hoverSmoothedRef.current.y;
-
-            hover.cameraAngle = sx * currentRig.hover.maxCameraDeg;
-            hover.instrumentYawDeg = sx * currentRig.hover.maxYawDeg;
-            hover.eclipticPhaseDeg = sx * currentRig.hover.maxEclipticDeg;
-            hover.polarAxisTiltDeg = sy * currentRig.hover.maxPolarTiltDeg;
-        }
-
         if (!draggingRef.current) {
             const vx = velRef.current.x;
             const vy = velRef.current.y;
@@ -263,24 +207,17 @@ export function ArmillarySphere({
         const total: ArmillaryMotionFrameOffsets = {
             instrumentYawDeg:
                 entrance.instrumentYawDeg +
-                hover.instrumentYawDeg +
                 dragAccumRef.current.instrumentYawDeg,
             eclipticPhaseDeg:
                 entrance.eclipticPhaseDeg +
-                hover.eclipticPhaseDeg +
                 dragAccumRef.current.eclipticPhaseDeg,
             polarAxisTiltDeg:
                 entrance.polarAxisTiltDeg +
-                hover.polarAxisTiltDeg +
                 dragAccumRef.current.polarAxisTiltDeg,
             cameraAngle:
-                entrance.cameraAngle +
-                hover.cameraAngle +
-                dragAccumRef.current.cameraAngle,
+                entrance.cameraAngle + dragAccumRef.current.cameraAngle,
             cameraDistance:
-                entrance.cameraDistance +
-                hover.cameraDistance +
-                dragAccumRef.current.cameraDistance,
+                entrance.cameraDistance + dragAccumRef.current.cameraDistance,
         };
 
         const elapsedEntrance =
@@ -292,23 +229,11 @@ export function ArmillarySphere({
             reduceMotion ||
             elapsedEntrance >= currentRig.entrance.durationMs;
 
-        const hoverSettling =
-            canHover &&
-            currentRig.hover.enabled &&
-            !reduceMotion &&
-            !draggingRef.current &&
-            (Math.abs(hoverTargetRef.current.x - hoverSmoothedRef.current.x) >
-                0.015 ||
-                Math.abs(
-                    hoverTargetRef.current.y - hoverSmoothedRef.current.y,
-                ) > 0.015);
-
         const motionAlive =
             !entranceComplete ||
             draggingRef.current ||
             Math.abs(velRef.current.x) > 1.5e-3 ||
-            Math.abs(velRef.current.y) > 1.5e-3 ||
-            hoverSettling;
+            Math.abs(velRef.current.y) > 1.5e-3;
 
         const changed = !composedMotionChannelsNear(
             base,
@@ -372,43 +297,6 @@ export function ArmillarySphere({
         stopRaf,
     ]);
 
-    const updateHoverFromEvent = useCallback(
-        (clientX: number, clientY: number) => {
-            const el = rootRef.current;
-
-            if (!el) {
-                return;
-            }
-
-            const r = el.getBoundingClientRect();
-
-            if (r.width < 1 || r.height < 1) {
-                return;
-            }
-
-            const nx = ((clientX - r.left) / r.width) * 2 - 1;
-            const ny = ((clientY - r.top) / r.height) * 2 - 1;
-
-            hoverTargetRef.current = {
-                x: Math.max(-1, Math.min(1, nx)),
-                y: Math.max(-1, Math.min(1, ny)),
-            };
-            kickRaf();
-        },
-        [kickRaf],
-    );
-
-    const onPointerEnter = useCallback(
-        (e: ReactPointerEvent<HTMLDivElement>) => {
-            if (!interactionEnabled || !canHover || reduceMotion) {
-                return;
-            }
-
-            updateHoverFromEvent(e.clientX, e.clientY);
-        },
-        [canHover, interactionEnabled, reduceMotion, updateHoverFromEvent],
-    );
-
     const onPointerMove = useCallback(
         (e: ReactPointerEvent<HTMLDivElement>) => {
             if (!interactionEnabled) {
@@ -459,21 +347,9 @@ export function ArmillarySphere({
                 pointerSamplesRef.current.push(lastPointerRef.current);
                 pointerSamplesRef.current = pointerSamplesRef.current.slice(-8);
                 kickRaf();
-
-                return;
-            }
-
-            if (canHover && !reduceMotion) {
-                updateHoverFromEvent(e.clientX, e.clientY);
             }
         },
-        [
-            canHover,
-            interactionEnabled,
-            reduceMotion,
-            kickRaf,
-            updateHoverFromEvent,
-        ],
+        [interactionEnabled, kickRaf],
     );
 
     const endDrag = useCallback(
@@ -537,15 +413,6 @@ export function ArmillarySphere({
         [interactionEnabled, kickRaf],
     );
 
-    const onPointerLeave = useCallback(() => {
-        if (!interactionEnabled) {
-            return;
-        }
-
-        hoverTargetRef.current = { x: 0, y: 0 };
-        kickRaf();
-    }, [interactionEnabled, kickRaf]);
-
     useEffect(() => {
         if (!interactionEnabled || reduceMotion) {
             return;
@@ -591,7 +458,6 @@ export function ArmillarySphere({
 
     return (
         <motion.div
-            ref={rootRef}
             className="w-[min(92vw,28rem)] max-w-full cursor-grab touch-manipulation select-none active:cursor-grabbing motion-reduce:cursor-default motion-reduce:active:cursor-default"
             initial={reduceMotion ? false : { opacity: 0.96 }}
             animate={{ opacity: 1 }}
@@ -605,8 +471,6 @@ export function ArmillarySphere({
             onPointerMove={onPointerMove}
             onPointerUp={endDrag}
             onPointerCancel={endDrag}
-            onPointerEnter={onPointerEnter}
-            onPointerLeave={onPointerLeave}
         >
             <div dangerouslySetInnerHTML={{ __html: html }} />
         </motion.div>
